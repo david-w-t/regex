@@ -12,6 +12,7 @@
 
 struct abstract_regex
 {
+   virtual ~abstract_regex();
    virtual bool set_expression(const char*, bool isperl) = 0;
    virtual bool match_test(const char* text) = 0;
    virtual unsigned find_all(const char* text) = 0;

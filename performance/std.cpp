@@ -10,6 +10,7 @@
 
 #include "performance.hpp"
 #include <regex>
+#include <iostream>
 
 struct std_regex : public abstract_regex
 {
@@ -23,8 +24,9 @@ public:
       {
          e.assign(pe, isperl ? std::regex::ECMAScript : std::regex::extended);
       }
-      catch(const std::exception&)
+      catch(const std::exception& exc)
       {
+         std::cout << name() << (isperl ? " perl, " : ", ") << pe << " :  " << exc.what() << std::endl;
          return false;
       }
       return true;

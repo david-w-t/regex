@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <deque>
 #include <boost/chrono.hpp>
 #include <boost/detail/lightweight_main.hpp>
 #include <boost/regex.hpp>
@@ -41,6 +42,10 @@ list_type& engines()
 {
    static list_type l;
    return l;
+}
+
+abstract_regex::~abstract_regex()
+{
 }
 
 void abstract_regex::register_instance(boost::shared_ptr<abstract_regex> item)
@@ -165,12 +170,12 @@ int cpp_main(int argc, char* argv[])
    // involved in calling a regex matcher:
    test_match("abc", "abc");
    // these are from the regex docs:
-   test_match("^([0-9]+)(\\-| |$)(.*)$", "100- this is a line of ftp response which contains a message string");
+   test_match("^([0-9]+)(-| |$)(.*)$", "100- this is a line of ftp response which contains a message string");
    test_match("([[:digit:]]{4}[- ]){3}[[:digit:]]{3,4}", "1234-5678-1234-456");
    // these are from http://www.regxlib.com/
-   test_match("^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "john@johnmaddock.co.uk");
-   test_match("^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "foo12@foo.edu");
-   test_match("^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "bob.smith@foo.tv");
+   test_match("^([a-zA-Z0-9_.-]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "john@johnmaddock.co.uk");
+   test_match("^([a-zA-Z0-9_.-]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "foo12@foo.edu");
+   test_match("^([a-zA-Z0-9_.-]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "bob.smith@foo.tv");
    test_match("^[a-zA-Z]{1,2}[0-9][0-9A-Za-z]{0,1} {0,1}[0-9][A-Za-z]{2}$", "EH10 2QQ");
    test_match("^[a-zA-Z]{1,2}[0-9][0-9A-Za-z]{0,1} {0,1}[0-9][A-Za-z]{2}$", "G1 1AA");
    test_match("^[a-zA-Z]{1,2}[0-9][0-9A-Za-z]{0,1} {0,1}[0-9][A-Za-z]{2}$", "SW1 1ZZ");
@@ -184,12 +189,12 @@ int cpp_main(int argc, char* argv[])
    // involved in calling a regex matcher:
    test_match("abc", "abc", true);
    // these are from the regex docs:
-   test_match("^([0-9]+)(\\-| |$)(.*)$", "100- this is a line of ftp response which contains a message string", true);
+   test_match("^([0-9]+)(-| |$)(.*)$", "100- this is a line of ftp response which contains a message string", true);
    test_match("([[:digit:]]{4}[- ]){3}[[:digit:]]{3,4}", "1234-5678-1234-456", true);
    // these are from http://www.regxlib.com/
-   test_match("^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "john@johnmaddock.co.uk", true);
-   test_match("^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "foo12@foo.edu", true);
-   test_match("^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "bob.smith@foo.tv", true);
+   test_match("^([a-zA-Z0-9_.-]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "john@johnmaddock.co.uk", true);
+   test_match("^([a-zA-Z0-9_.-]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "foo12@foo.edu", true);
+   test_match("^([a-zA-Z0-9_.-]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$", "bob.smith@foo.tv", true);
    test_match("^[a-zA-Z]{1,2}[0-9][0-9A-Za-z]{0,1} {0,1}[0-9][A-Za-z]{2}$", "EH10 2QQ", true);
    test_match("^[a-zA-Z]{1,2}[0-9][0-9A-Za-z]{0,1} {0,1}[0-9][A-Za-z]{2}$", "G1 1AA", true);
    test_match("^[a-zA-Z]{1,2}[0-9][0-9A-Za-z]{0,1} {0,1}[0-9][A-Za-z]{2}$", "SW1 1ZZ", true);
